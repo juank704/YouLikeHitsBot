@@ -11,9 +11,6 @@ async def main():
     username = os.getenv('YOULIKEHITS_USERNAME', 'default_username')  # El segundo argumento es un valor predeterminado opcional
     password = os.getenv('YOULIKEHITS_PASSWORD', 'default_password')
 
-    print(username)
-    print(password)
-
     browser = ChromeFactory.create_instance(True)
     login = 'https://www.youlikehits.com/login.php'
     url = 'https://www.youlikehits.com/youtubenew2.php'
@@ -40,18 +37,11 @@ async def main():
     await asyncio.sleep(10)
 
     browser.get(url)
-
-    # Número de pestañas adicionales que deseas abrir con la misma URL
-    num_tabs = 0
-
-    for _ in range(num_tabs):
-        # Abrir una nueva pestaña
-        browser.execute_script("window.open('');")
-        # Cambiar a la nueva pestaña, que será la última en la lista de window_handles
-        browser.switch_to.window(browser.window_handles[-1])
-        # Cargar la URL en la nueva pestaña
-        browser.get(url)
     
+    acc = 0
+    follow_button_not_found = 0
+    # Variable para llevar el seguimiento de las combinaciones de número y puntos
+    combinations_tracker = {}
 
     while True:  # Repetir indefinidamente
         # Ejecuta la lógica síncrona en un hilo y espera su resultado
@@ -71,11 +61,25 @@ async def main():
                 # Intenta convertir el texto a número para asegurarse de que es un número válido
                 number = int(number_after_slash)
             except (ValueError, IndexError):
-                # Si ocurre un error en la extracción o conversión, establece el número a 30 por defecto
+                # Si ocurre un error en la extracción o conversión, establece el número a 1 por defecto
                 number = 1
 
 
             print("Número obtenido:", number)
+
+              # Verifica si 'number' es igual a 1
+            if number == 1:
+                # Incrementa el acumulador
+                acc += number
+                # Si el acumulador llega a 30, realiza el "refresh" y reinicia el acumulador
+                if acc >= 30:
+                    print("Realizando refresh de la página...")
+                    browser.get(url)
+                    acc = 0  # Reinicia el acumulador después del "refresh"
+            else:
+                # Si 'number' no es 1, el acumulador se reinicia a 0
+                acc = 0
+                
 
 
         # Buscar el botón por la clase 'followbutton' y hacer clic en él
@@ -83,6 +87,12 @@ async def main():
             follow_button.click()
         except NoSuchElementException:
             print("No se encontró el botón.")
+            # Verifica si el contador ha alcanzado 10
+            if follow_button_not_found >= 10:
+                print("Realizando refresh de la página debido a 10 intentos fallidos...")
+                browser.get(url)  # Refresca la página
+                follow_button_not_found = 0  # Reinicia el contador
+
         except StaleElementReferenceException:
             print("El elemento ya no está adjunto al DOM.")
 
@@ -92,6 +102,17 @@ async def main():
             points_element = browser.find_element(By.ID, "currentpoints")
             points = points_element.text  # Obtiene el texto del elemento, que son los puntos
             print("Cantidad de puntos:", points)
+
+            combination = f"{number}-{points}"
+            if combination in combinations_tracker:
+                combinations_tracker[combination] += 1
+                if combinations_tracker[combination] >= 5:
+                    print("Combinación repetida 5 veces. Realizando refresh...")
+                    browser.get(url)
+                    combinations_tracker = {}  # Reinicia el seguimiento
+            else:
+                combinations_tracker[combination] = 1
+
         except NoSuchElementException:
             # Maneja el caso en que el elemento no se encuentra
             print("El elemento que muestra los puntos no se encontró en la página.")
