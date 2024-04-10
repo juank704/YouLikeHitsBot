@@ -1,0 +1,82 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Caches de CPython
+*.pyc
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyInstaller
+# Usualmente estos archivos se encuentran en una carpeta llamada "dist"
+*.manifest
+*.spec
+
+# Certificados de prueba
+*.pem
+
+# Configuraciones de herramientas de virtualización
+.virtualenv/
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder configuraciones del proyecto
+.spyderproject
+.spyproject
+
+# Rope configuraciones del proyecto
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pyenv
+.python-version
+
+# pipenv
+#   De acuerdo a la documentación de pipenv, la recomendación es añadir el archivo Pipfile.lock.
+Pipfile.lock
+
+# Environments de Jupyter Notebook
+.ipynb_checkpoints
+
+# Configuraciones del editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+
+# Archivos de sistema operativo
+.DS_Store
+Thumbs.db
