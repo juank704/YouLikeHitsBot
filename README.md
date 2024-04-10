@@ -21,10 +21,12 @@ Antes de iniciar el bot, **es necesario configurar tus credenciales de YouLikeHi
 Para **iniciar el programa con 3 bots independientes**, cada uno destinado a generar puntos, usa el siguiente comando en la terminal:
 
 ```bash
-docker-compose up --build --scale app_instance=3 -d
+docker-compose up --build --scale bot=3 -d
 ```
 
 Este comando construirá las imágenes necesarias (si es la primera vez o si se han hecho cambios en el código o dependencias) y luego iniciará tres instancias del bot en modo "detached", permitiéndote continuar usando la terminal mientras los bots están en ejecución.
+
+El flag -d asegura que tus contenedores se ejecuten en el fondo, manteniendo tu terminal disponible para otras tareas.
 
 ## Nota
 
