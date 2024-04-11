@@ -1,0 +1,14 @@
+version: '3.8'
+
+x-common-settings: &common-settings
+  build: .
+  environment:
+    - YOULIKEHITS_USERNAME=${YOULIKEHITS_USERNAME}
+    - YOULIKEHITS_PASSWORD=${YOULIKEHITS_PASSWORD}
+    - PYTHONPATH=/YouLikeHitsBot
+  volumes:
+    - .:/YouLikeHitsBot
+
+services:
+  bot-number:
+    <<: *common-settings
