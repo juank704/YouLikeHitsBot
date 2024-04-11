@@ -49,7 +49,9 @@ async def main():
             browser.switch_to.window(main_window_handle)
 
             #close_extra_Windows
-            #browser.switch_to.window(main_window_handle)
+            close_extra_windows(browser, main_window_handle)
+
+            browser.switch_to.window(main_window_handle)
 
             font_element = browser.find_element(By.XPATH, "//font[contains(., 'Timer')]")
             # Extrae el texto completo del elemento
@@ -72,7 +74,7 @@ async def main():
                 # Incrementa el acumulador
                 acc += number
                 # Si el acumulador llega a 30, realiza el "refresh" y reinicia el acumulador
-                if acc >= 30:
+                if acc >= 5:
                     print("Realizando refresh de la página...")
                     browser.get(url)
                     acc = 0  # Reinicia el acumulador después del "refresh"
@@ -88,8 +90,8 @@ async def main():
         except NoSuchElementException:
             print("No se encontró el botón.")
             # Verifica si el contador ha alcanzado 10
-            if follow_button_not_found >= 10:
-                print("Realizando refresh de la página debido a 10 intentos fallidos...")
+            if follow_button_not_found >= 5:
+                print("Realizando refresh de la página debido a 5 intentos fallidos...")
                 browser.get(url)  # Refresca la página
                 follow_button_not_found = 0  # Reinicia el contador
 
