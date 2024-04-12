@@ -4,7 +4,7 @@ from automation.chrome_factory import ChromeFactory
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException, WebDriverException
+from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException, WebDriverException, TimeoutException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
@@ -79,50 +79,55 @@ async def main():
 
             browser.switch_to.window(main_window_handle)
 
-            # Buscar el botón por la clase 'followbutton' y hacer clic en él
-            follow_buttons = browser.find_elements(By.CLASS_NAME, 'followbutton')
+            max_retries = 5
+            wait_time = 1  # Comienza con 1 segundo
 
-            for button in follow_buttons:
+            for attempt in range(max_retries):
                 try:
-                    # Perform the action you want on each button. 
-                    # For example, clicking each follow button:
-                    button.click()
+                    follow_buttons = browser.find_elements(By.CLASS_NAME, 'followbutton')
+                   
+                    for button in follow_buttons:
+                        button.click()
 
-                    window_handles = browser.window_handles
-                    browser.switch_to.window(window_handles[-1])
+                        window_handles = browser.window_handles
+                        browser.switch_to.window(window_handles[-1])
 
-                    isValid = False
+                        isValid = False
 
-                    await asyncio.sleep(5)
+                        await asyncio.sleep(5)
 
-                    try:
-                        # Use XPath to search for the text anywhere in the document
-                        element = browser.find_element(By.XPATH, "//*[contains(text(), concat('We couldn', \"'\", 't locate the website you', \"'\", 're attempting to visit.'))]")
-                        print("Text found on the page.")
-                    except NoSuchElementException:
-                        print("Text not found on the page.")
-                        isValid = True
- 
-                  
-                    if isValid:
+                        try:
+                            # Use XPath to search for the text anywhere in the document
+                            element = browser.find_element(By.XPATH, "//*[contains(text(), concat('We couldn', \"'\", 't locate the website you', \"'\", 're attempting to visit.'))]")
+                            print("Text found on the page.")
+                        except NoSuchElementException:
+                            print("Text not found on the page.")
+                            isValid = True
 
-                        await asyncio.sleep(22)
-
-            
-                    close_extra_windows(browser, main_window_handle)
-                    browser.switch_to.window(main_window_handle)
                     
-                    # It's often a good idea to put a short delay between actions to avoid being flagged as a bot:
-                    await asyncio.sleep(1)
+                        if isValid:
+
+                            await asyncio.sleep(22)
+
+                        close_extra_windows(browser, main_window_handle)
+                        browser.switch_to.window(main_window_handle)
+                        
+                        # It's often a good idea to put a short delay between actions to avoid being flagged as a bot:
+                        await asyncio.sleep(1)
                     
-                    # You may need to handle exceptions for elements that are not interactable, 
-                    # such as those not visible or out of the viewport.
+                        break  # Salir del ciclo de reintentos si tiene éxito
+                except TimeoutException:
+                    print(f"Timeout, reintento {attempt + 1} de {max_retries}")
+                    await asyncio.sleep(wait_time)
+                    wait_time *= 2  # Aumenta el tiempo de espera para el próximo reintento
                 except Exception as e:
-                    print(f"An error occurred: {e}")
+                    print(f"Error inesperado: {e}")
+                    break  # Salir del ciclo en caso de error inesperado
+
+            # Buscar el botón por la clase 'followbutton' y hacer clic en él
 
             browser.get(url)  
             await asyncio.sleep(1)
-
 
         except NoSuchElementException:
             print("No se encontró el botón.")
